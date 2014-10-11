@@ -1,0 +1,102 @@
+#requirements
+# bitcoind and insight api installed, 
+# insight might have to stopped so the leveldb dir isn't locked
+# sudo pip install leveldb
+# sudo pip install plyvel
+import sys
+import argparse
+import logging
+import os
+import leveldb
+import plyvel
+import codecs
+import subprocess
+import datetime
+
+### Start of declaration of global variables
+default_dir_for_testnet_db=os.path.expanduser('~') + '/.insight/testnet' 
+default_dir_for_livenet_db=os.path.expanduser('~') + '/.insight' 
+logging.basicConfig(level=logging.INFO,format='%(asctime)s %(levelname)-6s %(message)s',datefmt="%H:%M:%S")
+database_dir=""
+start_time=datetime.datetime.now()
+### End of declaration of global variables
+
+
+
+def main():
+	parser = argparse.ArgumentParser(description='python script to parse bitcoin addresses from insight api\'s level db')
+	parser.add_argument('-testnet', action='store_true', dest='db_type', help='turn this on to process testnet db instead of livenet', required=False)
+	parser.add_argument('-d', action='store', dest='directory_for_db', help='if db directory is not default (i.e. ~/.insight..); specify', required=False)
+	parser.add_argument('-o', action='store', dest='output_file', help='\033[31m' +'(Rq)' + '\033[0m' + ' output file (e.g. extracted_add.txt)', required=True)
+	#parser.add_argument('-anon', action='store_true', dest='route_via_tor', help='route via tor or not', required=False)
+	parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+	args = parser.parse_args()
+	print_logo()
+	#logging.info("parameters")
+	if args.db_type: # Testnet
+		logging.info("db: testnet")
+		if not args.directory_for_db: # If no dir was mentioned, assign as default
+			args.directory_for_db=default_dir_for_testnet_db
+		extraction_core_txs(directory=args.directory_for_db,args=args)
+	else:			 # Livenet
+		logging.info("db: livenet")
+		if not args.directory_for_db:
+			args.directory_for_db=default_dir_for_livenet_db
+        extraction_core_txs(directory=args.directory_for_db,args=args)
+
+
+def extraction_core_txs(directory,args):
+	output_file = codecs.open(args.output_file, 'w', 'utf8')
+	logging.info("processing db dir: " + directory + "/txs")
+	count=0
+	show_interval = 100
+	for key, value in plyvel.DB(directory+"/txs", create_if_missing=False):
+		if key[0:4] != "txa2":
+			break
+		output_file.write(key + ' ' + value + '\n')
+		count+=1
+		if (count % show_interval) == 0:
+			logging.info('processed ' + str(count) +' txs')
+			show_interval = show_interval * 2
+	logging.info('processed ' + str(count) +' txs .. done.')
+	logging.info('sorting and removing redundancies in addresses.')
+	output_file.close()
+	subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+	logging.info('output file: ' + args.output_file)
+	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
+	logging.info('\033[92m' + 'completed.'+ '\033[0m') 
+	exit(0)
+
+
+def print_logo(indent="           "):
+	# print ello logo
+	new_lines_before=2
+	new_lines_after=4
+	for i in range(1,new_lines_before):
+		print("")
+	print("        py-bitcoin-address-extractor-f-i-a")
+	print("-------------------------------------------------------")
+	print("      python script to parse bitcoin addresses        ")
+	print("            from insight api's level db ")
+	print("                    version: Alpha")
+	print("-------------------------------------------------------")
+	print("")
+	print(" o                                                    ")
+	print("O     o                  o                            ")
+	print("O        O                                            ")
+	print("o       oOo                                           ")
+	print("OoOo. O  o   .oOo  .oOo. O 'OoOo. .oOo     .oOo  .oOoO")
+	print("O   o o  O   O     O   o o  o   O `Ooo.    `Ooo. o   O")
+	print("o   O O  o   o     o   O O  O   o     O        O O   o")
+	print("`OoO' o' `oO `OoO' `OoO' o  o   O `OoO'  O `OoO' `OoOo")
+	print("                                                     O ")
+	print("16QcZYETFbWRijK3xBVbDgpvW1ZWsdNujY                OoO' ")    
+	for i in range(1,new_lines_after):
+		print("")
+	# Initialize default logging behaviour
+
+def print_after_end(indent="           "):
+	print("\033[92m" + "@bitcoinsg" + "\033[0m")
+
+if __name__ == '__main__':
+    main()
