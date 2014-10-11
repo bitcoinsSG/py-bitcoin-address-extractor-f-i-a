@@ -19,7 +19,7 @@ python ./py-bitcoin-address-extractor-f-i-a.py --help
 
 requirements
 =====================
-python 2.7+ , plyvel, insight-api integrated & synched with bitcoind. 
+python 2.7+ , plyvel, insight-api integrated & synched with bitcoind 
 
 license
 =====================
