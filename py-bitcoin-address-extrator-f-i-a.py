@@ -58,20 +58,21 @@ def extraction_core_txs(directory,args):
 		if (count % show_interval) == 0:
 			logging.info('processed ' + str(count) +' txs')
 			show_interval = show_interval * 2
-	logging.info('processed ' + str(count) +' txs .. done.')
-	logging.info('sorting and removing redundancies in addresses.')
+	logging.info('processed ' + str(count) +' txs .. done')
+	logging.info('sorting and removing redundancies')
 	output_file.close()
 	subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
 	logging.info('output file: ' + args.output_file)
 	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
-	logging.info('\033[92m' + 'completed.'+ '\033[0m') 
+	logging.info('\033[92m' + 'completed.'+ '\033[0m')
+	print("") 
 	exit(0)
 
 
 def print_logo(indent="           "):
 	# print ello logo
-	new_lines_before=2
-	new_lines_after=4
+	new_lines_before=1
+	new_lines_after=2
 	for i in range(1,new_lines_before):
 		print("")
 	print("        py-bitcoin-address-extractor-f-i-a")
