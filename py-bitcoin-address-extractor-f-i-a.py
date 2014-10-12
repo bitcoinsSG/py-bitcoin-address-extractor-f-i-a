@@ -38,14 +38,62 @@ def main():
 		logging.info("db: testnet")
 		if not args.directory_for_db: # If no dir was mentioned, assign as default
 			args.directory_for_db=default_dir_for_testnet_db
-		extraction_core_txs_optimized_two(directory=args.directory_for_db,args=args)
+		extraction_core_txs_optimized_three(directory=args.directory_for_db,args=args)
 	else:			 # Livenet
 		logging.info("db: livenet")
 		if not args.directory_for_db:
 			args.directory_for_db=default_dir_for_livenet_db
-        extraction_core_txs_optimized_two(directory=args.directory_for_db,args=args)
+        extraction_core_txs_optimized_three(directory=args.directory_for_db,args=args)
 
 
+def extraction_core_txs_optimized_three(directory,args):
+	output_file = codecs.open(args.output_file, 'w', 'utf8')
+	logging.info("processing db dir: " + directory + "/txs")
+	logging.info("algo: extract-core optimized 3")
+	if(args.sorted):
+		logging.info("sorting: True")
+	else:
+		logging.info("sorting: False")
+	number_of_addreses=0
+	count=0
+	show_interval = 1000
+	currentaddress=["thisisatemplateusedforbootstrapping-",0]
+	currentaddresslen=len(currentaddress)
+	list_of_addresses=""
+	for key, value in plyvel.DB(directory+"/txs", create_if_missing=False):
+		#print key[0][0:2]
+		if key[2] != "a":
+			break
+		if not currentaddress == key[5:currentaddresslen+5]:
+			currentaddress = key[5:6+(key[5:].index("-"))]
+			currentaddresslen=len(currentaddress)
+			list_of_addresses=list_of_addresses+currentaddress
+			number_of_addreses+=1
+			#output_file.write(currentaddress + '\n')
+		count+=1
+		if (count % show_interval) == 0:
+			logging.info('~ ' + 'txs ' + str(count) + '\tadds\t' + str(number_of_addreses) )
+			show_interval = show_interval * 2
+	logging.info('done')
+	output_file.write(list_of_addresses)
+	output_file.close()
+	#for item in list_of_addresses:
+		#output_file.write("%s\n" % item)
+	if(args.sorted):
+		logging.info('sorting addresses')
+		subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -o " + args.output_file],shell=True)
+	else:
+		logging.info('processing file')
+		subprocess.call(["tr '-' '\n' < " + args.output_file +" > " + "temp_" + args.output_file],shell=True)
+		subprocess.call(["mv -f" + " temp_" + args.output_file + "  " + args.output_file],shell=True)
+	#subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+	logging.info('output file: ' + args.output_file)
+	logging.info('# of transactions: ' + str(count))
+	logging.info('   # of addresses: ' + str(number_of_addreses))
+	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
+	logging.info('\033[92m' + 'completed.'+ '\033[0m')
+	print("") 
+	exit(0)
 
 
 def extraction_core_txs_optimized_two(directory,args):
@@ -90,8 +138,8 @@ def extraction_core_txs_optimized_two(directory,args):
 		subprocess.call(["mv -f" + " temp_" + args.output_file + "  " + args.output_file],shell=True)
 	#subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
 	logging.info('output file: ' + args.output_file)
-	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
 	logging.info('# of addresses: ' + str(number_of_addreses))
+	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
 	logging.info('\033[92m' + 'completed.'+ '\033[0m')
 	print("") 
 	exit(0)
@@ -99,17 +147,17 @@ def extraction_core_txs_optimized_two(directory,args):
 
 def print_logo(indent="           "):
 	# print ello logo
-	new_lines_before=1
+	new_lines_before=2
 	new_lines_after=2
 	for i in range(1,new_lines_before):
 		print("")
-	print("         py-bitcoin-address-extractor-f-i-a")
+	print("          py-bitcoin-address-extractor-f-i-a")
 	print("-------------------------------------------------------")
-	print("      python script to parse bitcoin addresses        ")
-	print("            from insight api's level db ")
-	print("                    version: Alpha")
+	print("       python script to parse bitcoin addresses        ")
+	print("              from insight api's level db ")
+	print("                     version: Alpha")
 	print("-------------------------------------------------------")
-	print("")
+	#print("")
 	print(" o                                                    ")
 	print("O     o                  o                            ")
 	print("O        O                                            ")
