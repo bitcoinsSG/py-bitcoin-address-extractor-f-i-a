@@ -56,10 +56,11 @@ def extraction_core_txs_optimized_three(directory,args):
 		logging.info("sorting: False")
 	number_of_addreses=0
 	count=0
-	show_interval = 1
+	show_interval = 1000
 	currentaddress=["thisisatemplateusedforbootstrapping-",0]
 	currentaddresslen=len(currentaddress)
 	list_of_addresses=""
+	#logging.info("--------------------------------" )
 	for key, value in plyvel.DB(directory+"/txs", create_if_missing=False):
 		#print key[0][0:2]
 		if key[2] != "a":
@@ -72,9 +73,9 @@ def extraction_core_txs_optimized_three(directory,args):
 			#output_file.write(currentaddress + '\n')
 		count+=1
 		if (count % show_interval) == 0:
-			logging.info('tx: ' + str(count) + '\t add: ' + str(number_of_addreses) )
-			show_interval = show_interval * 10
-	logging.info('done')
+			logging.info("processed txs: " + "\t" + str(count) )
+			show_interval = show_interval * 2
+	#logging.info('done')
 	output_file.write(list_of_addresses)
 	output_file.close()
 	#for item in list_of_addresses:
@@ -91,8 +92,9 @@ def extraction_core_txs_optimized_three(directory,args):
 	logging.info('# of transactions: ' + str(count))
 	logging.info('   # of addresses: ' + str(number_of_addreses))
 	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
-	logging.info('\033[92m' + 'completed.'+ '\033[0m')
+	logging.info('\033[92m' + 'done.'+ '\033[0m')
 	print("") 
+	print("")
 	exit(0)
 
 
