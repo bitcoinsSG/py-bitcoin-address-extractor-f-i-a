@@ -37,17 +37,18 @@ def main():
 		logging.info("db: testnet")
 		if not args.directory_for_db: # If no dir was mentioned, assign as default
 			args.directory_for_db=default_dir_for_testnet_db
-		extraction_core_txs(directory=args.directory_for_db,args=args)
+		extraction_core_txs_optimized_two(directory=args.directory_for_db,args=args)
 	else:			 # Livenet
 		logging.info("db: livenet")
 		if not args.directory_for_db:
 			args.directory_for_db=default_dir_for_livenet_db
-        extraction_core_txs(directory=args.directory_for_db,args=args)
+        extraction_core_txs_optimized_two(directory=args.directory_for_db,args=args)
 
 
 def extraction_core_txs(directory,args):
 	output_file = codecs.open(args.output_file, 'w', 'utf8')
 	logging.info("processing db dir: " + directory + "/txs")
+	logging.info("algorithm: extraction core 0")
 	count=0
 	show_interval = 100
 	for key, value in plyvel.DB(directory+"/txs", create_if_missing=False):
@@ -58,10 +59,72 @@ def extraction_core_txs(directory,args):
 		if (count % show_interval) == 0:
 			logging.info('processed ' + str(count) +' txs')
 			show_interval = show_interval * 2
+	logging.info('processed ' + str(count) +' txs .. '+ '\033[92m' + 'done' + '\033[0m')
+	logging.info('sorting and removing redundancies')
+	output_file.close()
+	subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+	logging.info('output file: ' + args.output_file)
+	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
+	logging.info('\033[92m' + 'completed.'+ '\033[0m')
+	print("") 
+	exit(0)
+
+
+def extraction_core_txs_optimized(directory,args):
+	output_file = codecs.open(args.output_file, 'w', 'utf8')
+	logging.info("processing db dir: " + directory + "/txs")
+	logging.info("algorithm: extraction core optimized 1")
+	count=0
+	show_interval = 100
+	for key in plyvel.DB(directory+"/txs", create_if_missing=False):
+		#print key[0]
+		if key[0][0:4] != "txa2":
+			break
+		output_file.write(key[0] + '\n')
+		count+=1
+		if (count % show_interval) == 0:
+			logging.info('processed ' + str(count) +' txs')
+			show_interval = show_interval * 2
 	logging.info('processed ' + str(count) +' txs .. done')
 	logging.info('sorting and removing redundancies')
 	output_file.close()
 	subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+	logging.info('output file: ' + args.output_file)
+	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
+	logging.info('\033[92m' + 'completed.'+ '\033[0m')
+	print("") 
+	exit(0)
+
+def extraction_core_txs_optimized_two(directory,args):
+	output_file = codecs.open(args.output_file, 'w', 'utf8')
+	logging.info("processing db dir: " + directory + "/txs")
+	logging.info("algorithm: extraction core optimized 2")
+	count=0
+	show_interval = 100
+	currentaddress=["-thisisatemplateusedforbootstrapping-",0]
+	currentaddress[1]=len(currentaddress[0])
+	list_of_addresses=""
+	for key in plyvel.DB(directory+"/txs", create_if_missing=False):
+		#print key[0]
+		if key[0][0:4] != "txa2":
+			break
+		if not currentaddress[0] == key[0][4:currentaddress[1]+4]:
+			currentaddress[0] = key[0][4:6+(key[0][5:].index("-"))]
+			currentaddress[1]=len(currentaddress[0])
+			list_of_addresses=list_of_addresses+currentaddress[0][1:]
+			#output_file.write(currentaddress[0] + '\n')
+		count+=1
+		if (count % show_interval) == 0:
+			logging.info('processed ' + str(count) +' txs')
+			show_interval = show_interval * 2
+	logging.info('processed ' + str(count) +' txs .. '+ '\033[92m' + 'done' + '\033[0m')
+	output_file.write(list_of_addresses)
+	#for item in list_of_addresses:
+		#output_file.write("%s\n" % item)
+	logging.info('sorting and removing redundancies')
+	output_file.close()
+	subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -u -o " + args.output_file],shell=True)
+	#subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
 	logging.info('output file: ' + args.output_file)
 	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
 	logging.info('\033[92m' + 'completed.'+ '\033[0m')
