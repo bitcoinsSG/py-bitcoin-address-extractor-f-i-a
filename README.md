@@ -1,3 +1,5 @@
+attn: this repo is in alpha mode, come back later
+
 py-bitcoin-address-extractor-f-i-a
 =====================
 
@@ -5,7 +7,7 @@ python script to parse bitcoin addresses from insight api's level db
 
 
 
-![](http://i.imgur.com/A2SPNvh.png)
+![](http://i.imgur.com/euVAYXy.png)
 
 usage
 =====================
@@ -17,7 +19,7 @@ python ./py-bitcoin-address-extractor-f-i-a.py --help
 
 requirements
 =====================
-python 2.7+
+python 2.7+ , plyvel, insight-api integrated & synched with bitcoind 
 
 license
 =====================
