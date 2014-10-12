@@ -56,7 +56,7 @@ def extraction_core_txs_optimized_three(directory,args):
 		logging.info("sorting: False")
 	number_of_addreses=0
 	count=0
-	show_interval = 1000
+	show_interval = 1
 	currentaddress=["thisisatemplateusedforbootstrapping-",0]
 	currentaddresslen=len(currentaddress)
 	list_of_addresses=""
@@ -73,7 +73,7 @@ def extraction_core_txs_optimized_three(directory,args):
 		count+=1
 		if (count % show_interval) == 0:
 			logging.info('tx: ' + str(count) + '\t add: ' + str(number_of_addreses) )
-			show_interval = show_interval * 2
+			show_interval = show_interval * 10
 	logging.info('done')
 	output_file.write(list_of_addresses)
 	output_file.close()
