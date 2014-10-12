@@ -21,9 +21,11 @@ requirements
 =====================
 python 2.7+ , plyvel, insight-api integrated & synched with bitcoind
 
-installation
 
-no installation required, just stop insight server before running script
+execution
+=====================
+insight-api server needs to be stopped before running script
+
 
 license
 =====================
