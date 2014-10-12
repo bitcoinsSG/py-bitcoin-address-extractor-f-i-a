@@ -117,7 +117,7 @@ def extraction_core_txs_optimized_two(directory,args):
 		if (count % show_interval) == 0:
 			logging.info('processed ' + str(count) +' txs')
 			show_interval = show_interval * 2
-	logging.info('processed ' + str(count) +' txs .. '+ '\033[92m' + 'done' + '\033[0m')
+	logging.info('processed ' + str(count) +' txs .. '+  'done')
 	output_file.write(list_of_addresses)
 	#for item in list_of_addresses:
 		#output_file.write("%s\n" % item)
@@ -126,7 +126,7 @@ def extraction_core_txs_optimized_two(directory,args):
 	subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -u -o " + args.output_file],shell=True)
 	#subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
 	logging.info('output file: ' + args.output_file)
-	logging.info("total time: " + str(datetime.datetime.now()-start_time) )
+	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
 	logging.info('\033[92m' + 'completed.'+ '\033[0m')
 	print("") 
 	exit(0)
