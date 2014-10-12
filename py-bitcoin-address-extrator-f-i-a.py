@@ -100,7 +100,7 @@ def extraction_core_txs_optimized_two(directory,args):
 	logging.info("processing db dir: " + directory + "/txs")
 	logging.info("algorithm: extraction core optimized 2")
 	count=0
-	show_interval = 100
+	show_interval = 1000
 	currentaddress=["-thisisatemplateusedforbootstrapping-",0]
 	currentaddress[1]=len(currentaddress[0])
 	list_of_addresses=""
@@ -138,7 +138,7 @@ def print_logo(indent="           "):
 	new_lines_after=2
 	for i in range(1,new_lines_before):
 		print("")
-	print("        py-bitcoin-address-extractor-f-i-a")
+	print("         py-bitcoin-address-extractor-f-i-a")
 	print("-------------------------------------------------------")
 	print("      python script to parse bitcoin addresses        ")
 	print("            from insight api's level db ")
