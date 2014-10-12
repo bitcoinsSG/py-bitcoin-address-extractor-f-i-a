@@ -72,7 +72,7 @@ def extraction_core_txs_optimized_three(directory,args):
 			#output_file.write(currentaddress + '\n')
 		count+=1
 		if (count % show_interval) == 0:
-			logging.info('~ ' + 'txs ' + str(count) + '\tadds\t' + str(number_of_addreses) )
+			logging.info('tx: ' + str(count) + '\t add: ' + str(number_of_addreses) )
 			show_interval = show_interval * 2
 	logging.info('done')
 	output_file.write(list_of_addresses)
