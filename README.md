@@ -7,7 +7,7 @@ python script to parse bitcoin addresses from insight api's level db
 
 
 
-![](http://i.imgur.com/euVAYXy.png)
+![](http://i.imgur.com/pQt2eTn.png)
 
 usage
 =====================
