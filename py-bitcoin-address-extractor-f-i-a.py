@@ -27,6 +27,7 @@ def main():
 	parser = argparse.ArgumentParser(description='python script to parse bitcoin addresses from insight api\'s level db')
 	parser.add_argument('-testnet', action='store_true', dest='db_type', help='turn this on to process testnet db instead of livenet', required=False)
 	parser.add_argument('-sort', action='store_true', dest='sorted', help='turn this on to sort addresses', required=False)
+	parser.add_argument('-dryrun', action='store_true', dest='dry_run', help='turn this on to disable writing to file', required=False)
 	parser.add_argument('-d', action='store', dest='directory_for_db', help='if db directory is not default (i.e. ~/.insight..); specify', required=False)
 	parser.add_argument('-o', action='store', dest='output_file', help='\033[31m' +'(Rq)' + '\033[0m' + ' output file (e.g. extracted_add.txt)', required=True)
 	#parser.add_argument('-anon', action='store_true', dest='route_via_tor', help='route via tor or not', required=False)
@@ -47,7 +48,6 @@ def main():
 
 
 def extraction_core_txs_optimized_three(directory,args):
-	output_file = codecs.open(args.output_file, 'w', 'utf8')
 	logging.info("processing db dir: " + directory + "/txs")
 	logging.info("algo: extract-core optimized 3")
 	if(args.sorted):
@@ -75,20 +75,19 @@ def extraction_core_txs_optimized_three(directory,args):
 		if (count % show_interval) == 0:
 			logging.info("processed txs: " + "\t" + str(count) )
 			show_interval = show_interval * 2
-	#logging.info('done')
-	output_file.write(list_of_addresses)
-	output_file.close()
-	#for item in list_of_addresses:
-		#output_file.write("%s\n" % item)
-	if(args.sorted):
-		logging.info('sorting addresses')
-		subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -o " + args.output_file],shell=True)
-	else:
-		logging.info('processing file')
-		subprocess.call(["tr '-' '\n' < " + args.output_file +" > " + "temp_" + args.output_file],shell=True)
-		subprocess.call(["mv -f" + " temp_" + args.output_file + "  " + args.output_file],shell=True)
-	#subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
-	logging.info('output file: ' + args.output_file)
+	if not args.dry_run:
+		output_file = codecs.open(args.output_file, 'w', 'utf8')
+		output_file.write(list_of_addresses)
+		output_file.close()
+		if(args.sorted):
+			logging.info('sorting addresses')
+			subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -o " + args.output_file],shell=True)
+		else:
+			logging.info('processing file')
+			subprocess.call(["tr '-' '\n' < " + args.output_file +" > " + "temp_" + args.output_file],shell=True)
+			subprocess.call(["mv -f" + " temp_" + args.output_file + "  " + args.output_file],shell=True)
+	    #subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+		logging.info('output file: ' + args.output_file)
 	logging.info('# of transactions: ' + str(count))
 	logging.info('   # of addresses: ' + str(number_of_addreses))
 	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
