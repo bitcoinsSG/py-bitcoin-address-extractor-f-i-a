@@ -1,4 +1,4 @@
-attn: this repo is in alpha mode, come back later
+attn: this repo is in beta mode, use at your own risk.
 
 py-bitcoin-address-extractor-f-i-a
 =====================
