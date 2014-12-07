@@ -156,7 +156,7 @@ def print_logo(indent="           "):
 	print("-------------------------------------------------------")
 	print("       python script to parse bitcoin addresses        ")
 	print("              from insight api's level db ")
-	print("                     version: Alpha")
+	print("                     version: Beta")
 	print("-------------------------------------------------------")
 	#print("")
 	print(" o                                                    ")
