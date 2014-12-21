@@ -30,6 +30,8 @@ def main():
 	parser.add_argument('-dryrun', action='store_true', dest='dry_run', help='turn this on to disable writing to file', required=False)
 	parser.add_argument('-d', action='store', dest='directory_for_db', help='if db directory is not default (i.e. ~/.insight..); specify', required=False)
 	parser.add_argument('-o', action='store', dest='output_file', help='\033[31m' +'(Rq)' + '\033[0m' + ' output file (e.g. extracted_add.txt)', required=True)
+	parser.add_argument('-liteonmemory', action='store_true', dest='liteonmemory', help=' turn this on for machines with limited memory(slower execution)', required=False)
+
 	#parser.add_argument('-anon', action='store_true', dest='route_via_tor', help='route via tor or not', required=False)
 	parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 	args = parser.parse_args()
@@ -44,8 +46,62 @@ def main():
 		logging.info("db: livenet")
 		if not args.directory_for_db:
 			args.directory_for_db=default_dir_for_livenet_db
-        extraction_core_txs_optimized_three(directory=args.directory_for_db,args=args)
+        extraction_core_txs_optimized_four(directory=args.directory_for_db,args=args)
 
+
+def extraction_core_txs_optimized_four(directory,args):
+	logging.info("processing db dir: " + directory + "/txs")
+	logging.info("algo: extract-core optimized 4")
+	if(args.sorted):
+		logging.info("sorting: True")
+	else:
+		logging.info("sorting: False")
+	number_of_addreses=0
+	count=0
+	show_interval = 1000
+	currentaddress=["thisisatemplateusedforbootstrapping-",0]
+	currentaddresslen=len(currentaddress)
+	list_of_addresses=""
+	#logging.info("--------------------------------" )
+	if not args.dry_run:
+		output_file = codecs.open(args.output_file, 'w', 'utf8')
+	for key, value in plyvel.DB(directory+"/txs", create_if_missing=False):
+		#print key[0][0:2]
+		if key[2] != "a":
+			break
+		if not currentaddress == key[5:currentaddresslen+5]:
+			currentaddress = key[5:6+(key[5:].index("-"))]
+			currentaddresslen=len(currentaddress)
+			number_of_addreses+=1
+			if not args.liteonmemory:
+				list_of_addresses=list_of_addresses+currentaddress
+			else:
+				if not args.dry_run:
+					output_file.write(currentaddress)
+		count+=1
+		if (count % show_interval) == 0:
+			logging.info("processed txs: " + "\t" + str(count) )
+			show_interval = show_interval * 2
+	if not args.dry_run:
+		if not args.liteonmemory:
+			output_file.write(list_of_addresses)
+		output_file.close()
+		if(args.sorted):
+			logging.info('sorting addresses')
+			subprocess.call(["tr '-' '\n' < " + args.output_file +" | sort -o " + args.output_file],shell=True)
+		else:
+			logging.info('processing file')
+			subprocess.call(["tr '-' '\n' < " + args.output_file +" > " + "temp_" + args.output_file],shell=True)
+			subprocess.call(["mv -f" + " temp_" + args.output_file + "  " + args.output_file],shell=True)
+	    #subprocess.call(["awk -F'-' '{print $2}' " + args.output_file + " | sort -u -o " + args.output_file], shell=True)
+		logging.info('output file: ' + args.output_file)
+	logging.info('# of transactions: ' + str(count))
+	logging.info('   # of addresses: ' + str(number_of_addreses))
+	logging.info("total time: " + '\033[92m' + (datetime.datetime.now()-start_time).__str__().split('.')[0] + '\033[0m' + ' on ' + datetime.datetime.today().strftime('%b, %d, %Y') )
+	logging.info('\033[92m' + 'done.'+ '\033[0m')
+	print("") 
+	print("")
+	exit(0)
 
 def extraction_core_txs_optimized_three(directory,args):
 	logging.info("processing db dir: " + directory + "/txs")
