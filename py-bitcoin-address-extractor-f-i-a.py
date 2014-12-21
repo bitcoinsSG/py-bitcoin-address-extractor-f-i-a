@@ -56,6 +56,10 @@ def extraction_core_txs_optimized_four(directory,args):
 		logging.info("sorting: True")
 	else:
 		logging.info("sorting: False")
+	if not args.liteonmemory:
+		logging.info("intensive on memory, but fastest.")
+	else:
+		logging.info("lite on memory, but slower.")
 	number_of_addreses=0
 	count=0
 	show_interval = 1000
