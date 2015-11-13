@@ -36,7 +36,7 @@ requirements
 
 3) for fastest perfomance RAM > 8 Gb is required, if your RAM is limited use option "liteonmemory" ...
 
-4) old insight-api 
+4) [old insight-api](https://github.com/bitcoinsSG/old-insight-api) 
 
 python ./py-bitcoin-address-extractor-f-i-a.py -liteonmemory -o output_file.txt
 
